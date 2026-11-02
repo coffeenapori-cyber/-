@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Addness",
+      "mcp__Addness__*"
+    ]
+  }
+}
