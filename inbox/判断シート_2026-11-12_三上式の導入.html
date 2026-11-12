@@ -1,0 +1,282 @@
+<title>三上のAIの動き方を入れる 7つの決め事</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* 判断シートの型。上から：題 → 決めること → go の 1 行 → くわしく（折りたたみ） */
+  :root{
+    --bg:#F4F5F8; --card:#FFFFFF; --ink:#181C25; --muted:#5D6575; --line:#D9DEE6; --soft:#ECEFF4;
+    --accent:#2A47A8; --accent-soft:#E8EDFB; --ok:#1F7A4D; --ok-soft:#E3F3EA; --warn:#8A5C00; --warn-soft:#FFF3D4;
+    --font:"Hiragino Sans","Noto Sans JP",system-ui,-apple-system,sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#10131A; --card:#181C25; --ink:#E7EAF0; --muted:#9AA2B2; --line:#2B3241; --soft:#222937;
+      --accent:#93A6F5; --accent-soft:#1F2849; --ok:#7CD3A1; --ok-soft:#163125; --warn:#F2C572; --warn-soft:#3A2E12;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10131A; --card:#181C25; --ink:#E7EAF0; --muted:#9AA2B2; --line:#2B3241; --soft:#222937;
+    --accent:#93A6F5; --accent-soft:#1F2849; --ok:#7CD3A1; --ok-soft:#163125; --warn:#F2C572; --warn-soft:#3A2E12;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.7;padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .wrap{max-width:1000px;margin:0 auto}
+  h1{font-size:26px;line-height:1.35;margin:0;text-wrap:balance}
+  h2{font-size:19px;margin:0 0 6px}
+  h3{font-size:15px;margin:18px 0 6px}
+  .meta{color:var(--muted);font-size:13px;margin-top:8px}
+  .meta a{color:var(--accent)}
+  .lead{margin-top:18px;padding:14px 18px;background:var(--card);border-left:3px solid var(--accent)}
+  section{margin-top:36px;padding-top:22px;border-top:1px solid var(--line)}
+  .sub{color:var(--muted);font-size:14px}
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin-top:10px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:12px;font-weight:600}
+  .pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:14px}
+  .fig{margin:0;min-width:0}
+  .fig figcaption{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .fig .pic{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:14px;min-height:120px}
+  .tree{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.6;white-space:pre;overflow-x:auto;margin:0}
+  .tree .new{color:var(--ok);font-weight:700}
+  .tree .chg{color:var(--warn);font-weight:700}
+  .tag{font-size:11px;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:6px}
+  .tag.now{background:var(--warn-soft);color:var(--warn)} .tag.rec{background:var(--ok-soft);color:var(--ok)}
+  .qs{display:grid;gap:12px;margin-top:14px}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:10px 24px}
+  .qt{font-weight:600} .qt .id{color:var(--accent);margin-right:8px;font-variant-numeric:tabular-nums}
+  .why{font-size:13px;color:var(--muted);margin-top:4px}
+  .opts{display:flex;flex-direction:column;gap:6px}
+  .opt{display:flex;gap:10px;text-align:left;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;font:inherit;cursor:pointer;line-height:1.5}
+  .opt:hover{background:var(--soft)} .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .opt .dot{flex:none;width:14px;height:14px;border-radius:50%;border:2px solid var(--line);margin-top:5px}
+  .opt[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+  .opt[aria-checked="true"] .dot{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--card)}
+  .opt .l{font-weight:600;font-size:14px} .opt .s{display:block;font-size:12.5px;color:var(--muted)}
+  .rec{font-size:10.5px;font-weight:700;color:var(--ok);background:var(--ok-soft);padding:1px 6px;border-radius:4px;margin-left:8px}
+  .note{grid-column:1 / -1} .note textarea{width:100%;min-height:36px;resize:vertical;border:1px dashed var(--line);border-radius:6px;background:transparent;color:inherit;font:inherit;font-size:13px;padding:6px 10px}
+  .extra{margin-top:12px} .extra label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+  .extra textarea{width:100%;min-height:52px;resize:vertical;border:1px dashed var(--line);border-radius:8px;background:var(--card);color:inherit;font:inherit;font-size:13px;padding:8px 10px}
+  .bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px;font-size:13px;color:var(--muted)}
+  .pill{font-weight:600;padding:2px 9px;border-radius:999px;background:var(--soft)} .pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)}
+  .btn{border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:8px;padding:6px 14px;font:inherit;font-weight:600;cursor:pointer}
+  #answer{width:100%;margin-top:8px;font:inherit;font-size:13px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:inherit;padding:6px 10px}
+  .go{margin-top:14px;font-weight:600}
+  details.more{margin-top:28px;border-top:1px solid var(--line);padding-top:14px}
+  details.more>summary{cursor:pointer;font-weight:600;color:var(--accent)}
+  details.inner{margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--card)}
+  details.inner>summary{cursor:pointer;font-weight:600;font-size:14px}
+  pre.doc{font-size:12.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;margin:8px 0 0;max-height:420px;overflow:auto;background:var(--soft);padding:10px 12px;border-radius:6px}
+  ul.kata{margin:8px 0 0;padding-left:18px;font-size:13.5px}
+  ul.kata li{margin:2px 0}
+  ul.kata code{font-size:12px;background:var(--soft);padding:0 4px;border-radius:3px}
+  @media (max-width:760px){ .pair,.q{grid-template-columns:1fr} }
+</style>
+<div class="wrap">
+  <h1>三上のAIの動き方を、あなたのAddnessとこの作業場にどう入れるか？</h1>
+  <div class="meta">2026-11-12・ゴール「<a href="https://www.addness.com/goals/7a8416c1-0785-4430-981a-1afcd9a7e6eb">三上のAIの動き方をコピーする</a>」（手順2〜4・6・8・9の決め事）</div>
+
+  <div class="qs" id="qs"></div>
+  <div class="extra"><label for="extra">追加の指示（任意）</label><textarea id="extra" rows="2" placeholder="選択肢と別に、頼みたいこと・変えたいことがあれば書いてください"></textarea></div>
+  <p class="go">推奨のままなら「go」とだけ返してください。変える所だけ押し替えても大丈夫です。</p>
+  <div class="bar"><span class="pill" id="state">読み込み中</span><span id="hint"></span></div>
+  <div class="bar"><button class="btn" id="copy" type="button">答えをコピー</button></div>
+  <textarea id="answer" rows="2" readonly aria-label="答えの一言"></textarea>
+
+  <details class="more">
+  <summary>くわしく（なぜ今聞くか・調べた事実・今と案・CLAUDE.mdの中身・型の一覧・このあと）</summary>
+  <p class="lead">テンプレートの手順1〜9を進める中で、本人にしか決められないことが7つ出ました。あとの手順（自動化・ゴールを任せる）の中身もここで一緒に決めると、確認が1回で済みます。作業場のフォルダ・記憶・CLAUDE.mdの下書きは作ってありますが、まだGitHubには上げていません（戻せます）。</p>
+
+  <section>
+    <h2>調べた事実</h2>
+    <p class="sub">事実・推測・未確認を分けて書いています。</p>
+    <div class="tbl"><table>
+      <tr><th style="width:170px">項目</th><th>分かったこと</th></tr>
+      <tr><td>今の会話の場所</td><td>事実：クラウドで動く Claude Code（デスクトップアプリから開いた）。GitHub の coffeenapori-cyber/- を /home/user/- に開いている。会話が終わると、この場所のファイルは push した物以外消える。</td></tr>
+      <tr><td>あなたのパソコン</td><td>事実：この会話からは、あなたのパソコンのフォルダに届かない（Remote Control で共有されたフォルダは0件）。推測：ホームフォルダの ~/.claude/CLAUDE.md を書くには、パソコンで Claude Code を開いた会話が要る。</td></tr>
+      <tr><td>既にある物</td><td>事実：リポジトリに CLAUDE.md（「Addnessと働く」2026-10-26版）、.claude/settings.json（Addnessの道具を許可）、counseling-map.html（面談用のマインドマップ）がある。</td></tr>
+      <tr><td>「Addnessと働く」の最新</td><td>事実：Addness が配っている最新版は 2026-11-12。今のファイルは 10-26 版なので、2週間分の更新がある（判断シート・タスクの置き方・担当者の扱いが詳しくなった）。</td></tr>
+      <tr><td>テンプレートの前提との違い</td><td>事実：テンプレートはパソコンで動かす前提（作業場＝パソコンのフォルダ、自動化＝デスクトップアプリの定期実行）。この会話はクラウドなので、「作業場＝このリポジトリ」「自動化＝クラウドの定期実行で日誌に書いて push」に読み替えると、同じ形になる。未確認：クラウドの定期実行が push まで無人でできるかは、手順8で1回動かして確かめる。</td></tr>
+      <tr><td>記憶の置き場の設定</td><td>事実：.claude/settings.json に記憶の場所（autoMemoryDirectory）を足す書き込みは、この会話の自動モードの安全装置に止められた（AI自身の設定を変える操作のため）。手で足す1行は「くわしく」の下にある。</td></tr>
+      <tr><td>手順9の候補</td><td>事実：担当ゴールのうち、調べ物＋下書きで30分ほどに収まる物は「記事テンプレ作成：AIOに引用されやすい構成を決める」（期限 11/05 を過ぎている）。「歌唱発信の現状を棚卸し」はあなたの数字（登録者数・機材）が要るので聞く所が多い。「服5点の分解」は理想の擦り合わせが中心。</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>今と案</h2>
+    <div class="pair">
+      <figure class="fig"><figcaption><span class="tag now">今</span>リポジトリ coffeenapori-cyber/-</figcaption><div class="pic"><pre class="tree">coffeenapori-cyber/-
+├ CLAUDE.md        Addnessと働く 10-26
+├ .claude/settings.json
+└ counseling-map.html</pre></div></figure>
+      <figure class="fig"><figcaption><span class="tag rec">推奨</span>作業場として整えたあと</figcaption><div class="pic"><pre class="tree">coffeenapori-cyber/-
+├ <span class="chg">CLAUDE.md</span>        決まり＋Addness 11-12＋三上式
+├ <span class="chg">.claude/settings.json</span>  記憶の場所を足す
+├ <span class="new">.claude/agents/hands.md</span>  手
+├ <span class="new">inbox/</span>   <span class="new">projects/</span>   <span class="new">archive/</span>
+├ <span class="new">days/</span>2026-11-12.md   日誌
+├ <span class="new">automations/</span>毎朝の段取り/
+├ <span class="new">memory/</span>MEMORY.md ＋ 型20個
+└ counseling-map.html</pre></div></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>CLAUDE.md の中身（全文は下に畳んであります）</h2>
+    <p class="sub">3つの節からなります。1つ目は作業場の決まり（テンプレートの文のまま。持ち主の名前と、クラウドで開く時の一言を足した）。2つ目は Addness が配る「Addnessと働く」の 2026-11-12 版をそのまま。3つ目はテンプレートの「三上式の動き方」をそのまま（作業場の行だけ、この場所を書いた）。今ある 10-26 版の文は、11-12 版に置き換わります。</p>
+    <details class="inner"><summary>1. メイン作業場（決まり・フォルダ）</summary><pre class="doc" id="doc1"></pre></details>
+    <details class="inner"><summary>2. Addnessと働く（2026-11-12 版。Addness 公式の文、約6,000字）</summary><pre class="doc" id="doc2"></pre></details>
+    <details class="inner"><summary>3. 三上式の動き方（2026-11-10 版）</summary><pre class="doc" id="doc3"></pre></details>
+    <details class="inner"><summary>.claude/settings.json に手で足す1行（自動の書き込みが止められた分）</summary><pre class="doc">{
+  "autoMemoryDirectory": "/home/user/-/memory",
+  "permissions": { "allow": [ "mcp__Addness", "mcp__Addness__*" ] }
+}</pre><p class="sub">1行目の autoMemoryDirectory が新しい行です。会話の権限モードを「自動」以外にして「続けて」と送れば、AIが書きます。</p></details>
+  </section>
+
+  <section>
+    <h2>三上の型 20個（memory/ に1つ1ファイルで置いた物）</h2>
+    <p class="sub">Q2で外す物があれば、名前で書いてください。★は、これから先のAIの確認の出し方そのものを変える型です。</p>
+    <ul class="kata">
+      <li><code>judge-with-one-sheet</code> — 選択肢と材料が要る判断は、判断シート1枚で聞く。一言で済む問いは会話で一言</li>
+      <li><code>minimal-scope</code> — 頼まれた範囲ぴったりに作る。ついでの拡張は作らず、提案で止める</li>
+      <li><code>show-before-building</code> — 作り込む前に、画面は絵で・文面は全文と変えた所で見せる</li>
+      <li><code>let-them-say-what-is-wrong</code> — ダメ出しやり直しを言われたら、まず本人に何が問題かを話してもらってから作る</li>
+      <li><code>first-look-review</code> — 作った物は、要件を知らない別のAIに見せ、迷った所を言わせてから本人に見せる</li>
+      <li><code>check-premise-before-fixing</code> — レビューの指摘を直す前に、直し方の前提が本当かを実物で確かめる</li>
+      <li><code>verify-with-evidence</code> — 「できました」は、終了コード・件数・画面などの実物で確かめてから言う</li>
+      <li><code>check-time-with-date</code> — 時刻を書く直前に、date で今の時刻を確かめる</li>
+      <li><code>child-goal-per-work-unit</code> — 作業は意味が閉じる区切りごとにタスクとしてAddnessに置き、終わったらすぐ完了にする</li>
+      <li><code>keep-goal-body-rich</code> — ゴール本文には、決めたことと理由・分かったこと・成果物の場所・作業記録をしっかり書く</li>
+      <li><code>no-writing-to-completed-goals</code> — 完了したゴールには書き込まない</li>
+      <li><code>readme-is-a-map</code> — フォルダの README は地図だけ。進み具合はAddnessへ</li>
+      <li><code>explain-reasons-to-ai</code> — AIへの説明は、禁止の羅列ではなく、なぜそうするかを書く</li>
+      <li>★ <code>ask-only-for-irreversible</code> — 止まって許可を取るのは、消す・外へ送る・お金が動くなど戻せない操作だけ。戻せる作業は任された範囲で進める</li>
+      <li><code>place-task-before-work</code> — 何かを始める前に、Addnessで同じ話のタスクを探し、無ければ置いてから始める</li>
+      <li><code>tasks-not-states</code> — やることを出す時は、タスクだけを出す。状態の文を並べない</li>
+      <li><code>show-structure-as-pictures</code> — 流れ・ツリー・今と案・比較は、文章でなく絵で見せる</li>
+      <li><code>plain-words</code> — 説明は普通の言葉で書く。自分で作った比喩や呼び名を使わない</li>
+      <li><code>real-examples-first</code> — 事例や参考を出す時は、実物を並べて本人に選んでもらう</li>
+      <li><code>first-value-early</code> — 手順の多い仕事は、関心が続いているうちに最初の成果を見せる。確認を続けて挟まない</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>このあと（推奨のまま進めた場合）</h2>
+    <ul>
+      <li>AIが、作業場のファイル一式（CLAUDE.md・memory/・days/・hands.md）を GitHub の作業ブランチに commit して push する。手順2・3・4・5を完了にする。</li>
+      <li>手順7：AIがゴールにコメントを1つ書き、あなたが Addness で返事をする（練習）。</li>
+      <li>手順8：毎朝 8:00（日本時間）にクラウドで動く定期実行を1本作り、今日のToDoの最初の一手まで days/ の日誌に書いて push する。1回手で動かして確かめる。</li>
+      <li>手順9：「記事テンプレ作成：AIOに引用されやすい構成を決める」を、読む → タスクを置く → 進める → 本文に残す、の流れで進める。</li>
+      <li>パソコンで Claude Code を開いた時は、このリポジトリを clone し、ホームフォルダの ~/.claude/CLAUDE.md にも同じ2つの節を入れる（その時に差分を見せる）。</li>
+    </ul>
+  </section>
+  </details>
+</div>
+<script>
+(function(){
+  var KEY = "decisions/mikami-setup-20261112";
+  var QUESTIONS = [
+    { id:"q1", t:"作業場と、毎回読まれる決まり（CLAUDE.md）をどうするか", why:"クラウドの会話から届く置き場はこのリポジトリだけ。今ある「Addnessと働く」10-26版は、Addnessの最新 11-12版に置き換える",
+      opts:[ {v:"a", l:"A: このリポジトリを作業場にし、CLAUDE.md を3節（決まり・Addness 11-12・三上式）に差し替える", s:"GitHubに上がるので、クラウドでもパソコンでも同じ決まりで動く。元の文は git の履歴に残り、戻せる", rec:true},
+             {v:"b", l:"B: 作業場はこのリポジトリ。「Addnessと働く」は 10-26 版のまま、三上式だけ足す", s:"Addnessの新しい決まり（担当者の扱い・タスクの置き方）は入らない。あとで更新できる"},
+             {v:"c", l:"C: 作業場はパソコンの別のフォルダにしたい", s:"この会話からは作れない。パソコンで Claude Code を開いた会話で手順2〜4をやり直す。今回作った物は、そのまま持っていける"} ] },
+    { id:"q2", t:"三上の型 20個を記憶（memory/）に入れるか", why:"20個の一覧は「くわしく」にある。★の ask-only-for-irreversible は、戻せる作業は聞かずに進む、という確認の出し方を決める型",
+      opts:[ {v:"a", l:"A: 20個すべて入れる（★ ask-only-for-irreversible も含む）", s:"AIは、消す・外へ送る・お金が動く時だけ止まって聞き、下書きや調べ物は任された範囲で進める。1つずつ後から消せる", rec:true},
+             {v:"b", l:"B: ★ ask-only-for-irreversible だけ外して19個", s:"AIは今までどおり、小さな変更でも確認を挟みがちになる"} ] },
+    { id:"q3", t:"毎朝の自動化（手順8）を、どこで動かすか", why:"作業場がこのリポジトリなので、クラウドで動かしても日誌に書いて GitHub に残せる。パソコンの電源に左右されない",
+      opts:[ {v:"a", l:"A: クラウドの定期実行（Claude Code の「スケジュールされたタスク」）", s:"毎朝、無人で日誌に書いて push する。パソコンが閉じていても動く。読むだけで、ゴールの変更・完了・コメント・外への送信はしない", rec:true},
+             {v:"b", l:"B: パソコンのデスクトップアプリの定期実行", s:"パソコンとアプリが開いている時だけ動く。この会話からは作れないので、手順8は「パソコンで開いた時に作る」と本文に書いて完了にする"} ] },
+    { id:"q4", t:"毎朝、何時に動かすか（日本時間）", why:"8:00 なら、一日の予定を見る前に日誌が出来ている。クラウドなら電源は気にしなくてよい",
+      opts:[ {v:"a", l:"A: 7:00", s:"早起きの日に合う。日誌の時刻が早い分、前日夜の変更は拾いにくい"},
+             {v:"b", l:"B: 8:00", s:"起きてから見るのにちょうどよい", rec:true},
+             {v:"c", l:"C: 9:00", s:"朝のレッスンや予定が先に始まる日は、見るのが遅れる"} ] },
+    { id:"q5", t:"段取りを、どこまで書くか", why:"最初の一手まで書くと、朝に「今日は何から」を考えなくてよい。ToDoごとに理想と本文も読むので、1回あたりの時間と費用は少し増える",
+      opts:[ {v:"a", l:"A: ゴールごとに一言", s:"短くて読みやすい。何から手を付けるかは自分で考える"},
+             {v:"b", l:"B: ゴールごとに最初の一手まで", s:"朝そのまま動ける。長くなる日もある", rec:true} ] },
+    { id:"q6", t:"手順9で、最初に任せるゴール（30分ほどで一通り流す練習）", why:"調べ物＋下書きで、あなたの数字を聞かずに進められ、期限も過ぎている物を推奨",
+      opts:[ {v:"a", l:"A: 記事テンプレ作成：AIOに引用されやすい構成（結論先出し・Q&A・著者情報・構造化データ）を決める", s:"調べて、記事テンプレの下書きを本文に置く。期限 11/05 を過ぎている", rec:true},
+             {v:"b", l:"B: 歌唱発信の現状を棚卸しする（チャンネル・登録者数・過去の動画・機材）", s:"あなたの数字と機材を聞く所が多く、会話の往復が増える"},
+             {v:"c", l:"C: 服5点のゴールをしっかり分解する（なぜ・理想・現状を擦り合わせ、段と最初のタスクを決める）", s:"理想の擦り合わせが中心。判断シートが1〜2枚出る"} ] },
+    { id:"q7", t:"任せたゴールとその子の中は、都度の確認なしで進めてよいか", why:"本文を書く・子タスクを作る・完了にする、の3つ。消す・外へ送る・ほかのゴールを変える時は、どちらでも確認する",
+      opts:[ {v:"a", l:"A: はい。その中は確認なしで進める", s:"一気に流れを通せる。本文は後から直せる", rec:true},
+             {v:"b", l:"B: 本文を書く前・完了にする前に、毎回見せてほしい", s:"止まる回数が増えるが、一つずつ見られる"} ] },
+  ];
+
+  var DOCS = {
+    doc1: "# メイン作業場\n\nAIと一緒に働くための作業場。持ち主：山口明輝\n\nこのリポジトリ（GitHub の coffeenapori-cyber/- ）がそのまま作業場。クラウドの Claude Code はここに開かれるので、ここにある CLAUDE.md が、毎回最初に読まれる決まりになる。パソコンで開く時も、このリポジトリを clone して、その中で開く。\n\n## 決まり\n\n1. 仕事の状態・決めたこと・分かったことの正本は、Addnessのゴール本文。ここに置くのは、作業中のファイルと自動化の出力だけ。\n2. 置き場所は二択。このパソコンに置く仕事のファイルはこの作業場の中、クラウドに上げる物はAddness。作業場の外に新しい置き場を作らない（別の場所にあるリポジトリでの開発は、そのリポジトリで行う）。\n3. projects/ の各フォルダの README.md は地図だけ（何の領域か、中に何がどう入っているか）。進み具合や状態はAddnessのゴールに書く。\n4. ゴールで作業する時は、そのゴールの本文に「参照データ：このフォルダの場所」と書いて、ゴールからフォルダをたどれるようにする。\n5. 領域の仕事がすべて終わったら、そのフォルダを archive/ へ移す。\n6. クラウドで開いた会話では、作ったファイルは会話の終わりまでに commit して push する（container は消えるので、push していない物は残らない）。\n\n## フォルダ\n\n- inbox/ … まだ分けていない物の一時置き場\n- projects/ … 生きている仕事の領域ごとのフォルダ（Addnessの大きめのゴールと対）\n- days/ … 日誌（YYYY-MM-DD.md）\n- automations/ … 決まった時刻に動く自動化ごとのフォルダ\n- archive/ … 終わった仕事\n- memory/ … AIの記憶（索引は memory/MEMORY.md）\n- counseling-map.html … 生徒との面談で使うマインドマップのアプリ（この作業場を作る前からある物）",
+    doc2: "（Addness が get_recommended_agent_instructions で配っている 2026-11-12 版を、一字も変えずに入れています。節の見出しは「## Addnessと働く」、目印は <!-- addness-agent-instructions 2026-11-12 -->。中身の節：世界観／AIにとって大事なこと（この順）／二つのループ（タスクループ・ゴール更新ループ、入力を受けたら、タスクを出す・更新する、タスクをやり切る、別のタスクの種を見つけたら）／作法（判断シート・作業記録・聞く相手・担当者を取り違えない・認知負荷・会話の名前）／やらない。\n\n10-26版からの主な違い：判断シートを出す場面と出さない場面がはっきりした。「タスクを出して」は「置いて」ではない（見せてOKをもらってから置く）。ほかの人が担当するゴールに書く・完了にする・タスクを置く前に一言確かめる。「今やるか、後に回すか」を合意してから動く。）",
+    doc3: "## 三上式の動き方\n<!-- mikami-way 2026-11-10 -->\n\n「Addnessと働く」に加えて、次のように動く。食い違う所があれば「Addnessと働く」に従う。\n\n- 作業場： /home/user/- （GitHub の coffeenapori-cyber/- リポジトリ。クラウドの Claude Code はここに開かれる。パソコンで開く時は、このリポジトリを clone した場所）。仕事のファイル（資料・下書き・日誌・記憶）はここに置く。決まりは作業場の CLAUDE.md。\n- 始める前に、Addnessに置く。 何かを頼まれたら、まずAddnessで同じ話のタスクやゴールを探す。無ければ、本人のゴールの下にタスクを置いてから始める。完了したゴールには書き足さず、新しいタスクを置く。その場で終わる軽い質問には置かない。\n- 始めた・止まった・終えたを、Addnessに知らせる。 ゴールの仕事を始めたら report_goal_agent_activity で作業中（working）、本人の判断を待つ時は確認待ち（waiting）、終えたら終了（done）にする。終えたタスクは、その場で完了にする。\n- 聞く前に絞る。 推奨を出せる選択（言い回し・構成・やり方・技術の選び方）は、聞かずに推奨で進め、選んだ案とほかの案を結果に添えて、後から変えられるようにする。止まって聞くのは、本人にしか決められないこと（事業の判断・お金・外に出す物の最終確認と送信・消すなど戻せない操作）だけ。\n- 返事の1行目で、誰の番かを言う。 【あなたの番】頼むこと1行（推奨のままなら「go」）／【作業中】何を・いつ頃まで／【返信待ち】誰の何／【待機中】何を待つか・いつ再開するか／【完了】結果1行。【あなたの番】の時は、次の行に何の話か（ゴールの題とURL）と見る物を書き、本人の手が要ることだけを番号で、どこを開いて何を押すかまで書く。\n- 構造は絵で見せる。 流れ・ツリー・今と案・比較は、文章で説明せず、まず絵にして、文は一言だけ添える。項目が多い絵は、1枚のページで出す（Claude CodeのArtifactなど。出せなければ作業場にHTMLを書いてブラウザで開く）。説明は普通の言葉で書き、自分で作った比喩や呼び名を使わない。\n- 頭と手を分ける。 自分（頭）は、要件を決める・判断シートを作る・できた物を確かめる。仕様が決まった作業や修正は「手」（別のAI・別の会話）に任せる。作った物は、作ったのとは別のAIに、要件を伝えずに見せ、目が動いた順に迷った所・分からなかった言葉を言わせてから（初見の見直し）、直して本人に見せる。\n- 作る前に見せる。 画面は絵（モック）で、文面は全文と変えた所で、作り込む前に見せる。\n- 人の返事はAddnessで待つ。 本人以外の人（またはこの会話にいない本人）に聞く時は、ゴールにコメントを書いて相手をメンションし、wait_for_reply で返事を待つ。返事が来たら、その返事から続きを始める。待ち続けられない環境では、本人に「Addnessで返事をしたら、この会話で『続けて』と送ってください」と伝えて止まる。\n- 日誌を書く。 仕事のひと区切りごとに、作業場の days/YYYY-MM-DD.md に「時刻・やったこと・決まったこと・成果物の場所」を1〜3行で足す。時刻は書く直前に date で確かめる。\n- 記憶を書きためる。 会話を始めたら作業場の memory/MEMORY.md を読み、関係する記憶を開いてから動く。本人に直された時・叱られた時・やり方を認められた時は、その場で memory/ に1つ1ファイルで書き、「なぜ（Why）」と「どう使うか（How to apply）」を添えて、memory/MEMORY.md に1行足す。同じことを二度言わせない。"
+  };
+  Object.keys(DOCS).forEach(function(k){ var el=document.getElementById(k); if(el) el.textContent=DOCS[k]; });
+
+  var state={}; QUESTIONS.forEach(function(q){ var r=q.opts.filter(function(o){return o.rec;})[0]; state[q.id]=(r||q.opts[0]).v; });
+  var OTHER={v:"other", l:"その他", s:"選択肢に無い答えを、下の欄に一言で"};
+  var db=null, saving=false, dirty=false;
+  var $=function(id){return document.getElementById(id);};
+  function answerText(){
+    var a=QUESTIONS.map(function(q){ var n=(state[q.id+"_note"]||"").trim(), v=state[q.id]==="other"?"その他":state[q.id].toUpperCase(); return q.id.toUpperCase()+" "+v+(n?"（"+n+"）":""); }).join(" / ");
+    var x=(state.extra||"").trim(); return a+(x?" / 追加の指示："+x:"");
+  }
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function render(){
+    var root=$("qs"); root.innerHTML="";
+    QUESTIONS.forEach(function(q){
+      var box=document.createElement("div"); box.className="q";
+      var left=document.createElement("div");
+      left.innerHTML='<div class="qt"><span class="id">'+q.id.toUpperCase()+'</span>'+esc(q.t)+'</div><div class="why">'+esc(q.why)+'</div>';
+      var opts=document.createElement("div"); opts.className="opts"; opts.setAttribute("role","radiogroup"); opts.setAttribute("aria-label",q.t);
+      q.opts.concat([OTHER]).forEach(function(o){
+        var b=document.createElement("button"); b.type="button"; b.className="opt"; b.id=q.id+"-"+o.v;
+        b.setAttribute("role","radio"); b.setAttribute("aria-checked",String(state[q.id]===o.v));
+        b.innerHTML='<span class="dot"></span><span><span class="l">'+esc(o.l)+'</span>'+(o.rec?'<span class="rec">推奨</span>':'')+(o.s?'<span class="s">'+esc(o.s)+'</span>':'')+'</span>';
+        b.addEventListener("click",function(){
+          if(state[q.id]!==o.v){ state[q.id]=o.v; render(); persist(); }
+          if(o.v==="other"){ var t=$(q.id+"-note"); if(t) t.focus(); }
+        });
+        opts.appendChild(b);
+      });
+      var note=document.createElement("div"); note.className="note";
+      var ta=document.createElement("textarea"); ta.id=q.id+"-note"; ta.placeholder=state[q.id]==="other"?"「その他」の答えを一言で":"聞きたいこと・補足があれば一言（任意）"; ta.value=state[q.id+"_note"]||"";
+      var timer; ta.addEventListener("input",function(){ state[q.id+"_note"]=ta.value; $("answer").value=answerText(); clearTimeout(timer); timer=setTimeout(persist,600); });
+      note.appendChild(ta); box.appendChild(left); box.appendChild(opts); box.appendChild(note); root.appendChild(box);
+    });
+    $("answer").value=answerText();
+  }
+  function status(kind,text,hint){ $("state").className="pill"+(kind?" "+kind:""); $("state").textContent=text; $("hint").textContent=hint||""; }
+  function saveLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(_){} }
+  async function persist(){
+    saveLocal();
+    if(!db){ status("warn","この画面だけ","保存先がありません。下の「答えをコピー」で一言を返してください。"); return; }
+    if(saving){ dirty=true; return; } saving=true; status("","保存中");
+    try{ await db.doc(KEY).set(Object.assign({},state,{version:1,updatedAt:new Date().toISOString()})); status("ok","保存しました","最終保存 "+new Date().toLocaleString("ja-JP")); }
+    catch(e){ status("warn","保存できませんでした","「答えをコピー」で一言を返してください。"); }
+    finally{ saving=false; if(dirty){ dirty=false; persist(); } }
+  }
+  $("copy").addEventListener("click",function(){
+    var t=answerText(), box=$("answer"); box.value=t;
+    try{ navigator.clipboard.writeText(t).then(function(){ status("ok","コピーしました","会話に貼ってください。"); },function(){ box.select(); }); }catch(_){ box.select(); }
+  });
+  try{ var saved=JSON.parse(localStorage.getItem(KEY)||"null"); if(saved) Object.assign(state,saved); }catch(_){}
+  var ex=$("extra"), exTimer; ex.value=state.extra||"";
+  ex.addEventListener("input",function(){ state.extra=ex.value; $("answer").value=answerText(); clearTimeout(exTimer); exTimer=setTimeout(persist,600); });
+  render(); status("","未保存（推奨のまま）","");
+  (async function(){
+    try{ db = window.claude && window.claude.use ? await window.claude.use("db") : null; }catch(_){ db=null; }
+    if(!db){ status("warn","この画面だけ","保存先がありません。押した答えは「答えをコピー」で会話に貼ってください。"); return; }
+    var timer=setTimeout(function(){ status("","未保存（推奨のまま）","押すと保存されます。"); }, 10000);
+    db.doc(KEY).onSnapshot(function(snap){
+      clearTimeout(timer);
+      var d = snap && snap.exists ? (typeof snap.data==="function" ? snap.data() : snap.data) : null;
+      if(d && d.version===1){
+        var ae=document.activeElement, typing=!!(ae && ae.tagName==="TEXTAREA" && !ae.readOnly);
+        QUESTIONS.forEach(function(q){ if(d[q.id]) state[q.id]=d[q.id]; if(typeof d[q.id+"_note"]==="string" && !(typing && ae.id===q.id+"-note")) state[q.id+"_note"]=d[q.id+"_note"]; });
+        if(typeof d.extra==="string" && !(typing && ae.id==="extra")){ state.extra=d.extra; ex.value=d.extra; }
+        if(typing) $("answer").value=answerText(); else render();
+        status("ok","保存済み","この画面の選択は、聞いた AI が読みます。");
+      } else { status("","未保存（推奨のまま）","押すと保存されます。"); }
+    }, function(){ clearTimeout(timer); status("warn","この画面だけ","「答えをコピー」で一言を返してください。"); });
+  })();
+})();
+</script>
