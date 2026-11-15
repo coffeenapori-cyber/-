@@ -1,6 +1,6 @@
 # HP記事のSEO・AIO対策
 
-SEED VOCAL SCHOOL のホームページ（http://seedvocalschool.com/ 、WordPress）に載せる記事を、検索（SEO）と AI の回答（AIO）の両方で拾われ、読んだ人が「しっかりした教室だ」と感じる形で作るための領域。
+SEED VOCAL SCHOOL のホームページ（https://seedvocalschool.com/ 、WordPress）に載せる記事を、検索（SEO）と AI の回答（AIO）の両方で拾われ、読んだ人が「しっかりした教室だ」と感じる形で作るための領域。
 
 対応する Addness のゴール：「ホームページの記事でSEO・AIO対策の土台を作る」 https://www.addness.com/goals/00a8b63f-f658-4a28-8454-9a22991b4555
 進み具合・決めたことは、このゴールの本文に書く。
