@@ -1,4 +1,5 @@
 {
+  "autoMemoryDirectory": "/home/user/-/memory",
   "permissions": {
     "allow": [
       "mcp__Addness",
