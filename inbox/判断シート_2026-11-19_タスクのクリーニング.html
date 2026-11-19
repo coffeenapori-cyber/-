@@ -1,0 +1,260 @@
+<title>タスクの片づけ 11/19</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* 判断シートの型。上から：題 → 決めること → go の 1 行 → くわしく（折りたたみ）。色はすべて下の変数から */
+  :root{
+    --bg:#F4F5F8; --card:#FFFFFF; --ink:#181C25; --muted:#5D6575; --line:#D9DEE6; --soft:#ECEFF4;
+    --accent:#2A47A8; --accent-soft:#E8EDFB; --ok:#1F7A4D; --ok-soft:#E3F3EA; --warn:#8A5C00; --warn-soft:#FFF3D4;
+    --font:"Hiragino Sans","Noto Sans JP",system-ui,-apple-system,sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#10131A; --card:#181C25; --ink:#E7EAF0; --muted:#9AA2B2; --line:#2B3241; --soft:#222937;
+      --accent:#93A6F5; --accent-soft:#1F2849; --ok:#7CD3A1; --ok-soft:#163125; --warn:#F2C572; --warn-soft:#3A2E12;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10131A; --card:#181C25; --ink:#E7EAF0; --muted:#9AA2B2; --line:#2B3241; --soft:#222937;
+    --accent:#93A6F5; --accent-soft:#1F2849; --ok:#7CD3A1; --ok-soft:#163125; --warn:#F2C572; --warn-soft:#3A2E12;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.7;padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .wrap{max-width:1000px;margin:0 auto}
+  h1{font-size:26px;line-height:1.35;margin:0;text-wrap:balance}
+  h2{font-size:19px;margin:0 0 6px}
+  h3{font-size:15px;margin:18px 0 6px}
+  .meta{color:var(--muted);font-size:13px;margin-top:8px}
+  .meta a{color:var(--accent)}
+  .lead{margin-top:18px;padding:14px 18px;background:var(--card);border-left:3px solid var(--accent)}
+  section{margin-top:36px;padding-top:22px;border-top:1px solid var(--line)}
+  .sub{color:var(--muted);font-size:14px}
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin-top:10px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:12px;font-weight:600}
+  .pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:14px}
+  .fig{margin:0;min-width:0}
+  .fig figcaption{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .fig .pic{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:14px;min-height:120px}
+  .tree{font-size:13.5px;line-height:1.7;margin:0;padding-left:0;list-style:none}
+  .tree li{padding:2px 0;border-bottom:1px dashed var(--line)}
+  .tree li:last-child{border-bottom:0}
+  .tree .n{display:inline-block;min-width:1.6em;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+  .tree .t{color:var(--muted);font-size:12px;margin-left:6px}
+  .tree .out{color:var(--muted);text-decoration:line-through}
+  .tree .done{color:var(--ok)}
+  .tag{font-size:11px;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:6px}
+  .tag.now{background:var(--warn-soft);color:var(--warn)} .tag.rec{background:var(--ok-soft);color:var(--ok)}
+  .qs{display:grid;gap:12px;margin-top:14px}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:10px 24px}
+  .qt{font-weight:600} .qt .id{color:var(--accent);margin-right:8px;font-variant-numeric:tabular-nums}
+  .why{font-size:13px;color:var(--muted);margin-top:4px}
+  .opts{display:flex;flex-direction:column;gap:6px}
+  .opt{display:flex;gap:10px;text-align:left;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;font:inherit;cursor:pointer;line-height:1.5}
+  .opt:hover{background:var(--soft)} .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .opt .dot{flex:none;width:14px;height:14px;border-radius:50%;border:2px solid var(--line);margin-top:5px}
+  .opt[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+  .opt[aria-checked="true"] .dot{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--card)}
+  .opt .l{font-weight:600;font-size:14px} .opt .s{display:block;font-size:12.5px;color:var(--muted)}
+  .rec{font-size:10.5px;font-weight:700;color:var(--ok);background:var(--ok-soft);padding:1px 6px;border-radius:4px;margin-left:8px}
+  .note{grid-column:1 / -1} .note textarea{width:100%;min-height:36px;resize:vertical;border:1px dashed var(--line);border-radius:6px;background:transparent;color:inherit;font:inherit;font-size:13px;padding:6px 10px}
+  .extra{margin-top:12px} .extra label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+  .extra textarea{width:100%;min-height:52px;resize:vertical;border:1px dashed var(--line);border-radius:8px;background:var(--card);color:inherit;font:inherit;font-size:13px;padding:8px 10px}
+  .bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px;font-size:13px;color:var(--muted)}
+  .pill{font-weight:600;padding:2px 9px;border-radius:999px;background:var(--soft)} .pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)}
+  .btn{border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:8px;padding:6px 14px;font:inherit;font-weight:600;cursor:pointer}
+  #answer{width:100%;margin-top:8px;font:inherit;font-size:13px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:inherit;padding:6px 10px}
+  .go{margin-top:14px;font-weight:600}
+  details.more{margin-top:28px;border-top:1px solid var(--line);padding-top:14px}
+  details.more>summary{cursor:pointer;font-weight:600;color:var(--accent)}
+  @media (max-width:760px){ .pair,.q{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+<div class="wrap">
+  <h1>期限切れの9件をどう片づけ、今日は何から始めるか？</h1>
+  <div class="meta">2026-11-19（木）・担当の未完了 106件のうち、期限切れ・止まっている物を読んだ結果。ほか 96件はそのまま残す（毎日・毎月の定期は対象外）。<a href="https://www.addness.com/todo">今やるべきToDo</a></div>
+
+  <div class="qs" id="qs"></div>
+  <div class="extra"><label for="extra">追加の指示（任意）</label><textarea id="extra" rows="2" placeholder="選択肢と別に、頼みたいこと・変えたいことがあれば書いてください"></textarea></div>
+  <p class="go">推奨のままなら「go」とだけ返してください。変える所だけ押し替えても大丈夫です。</p>
+  <div class="bar"><span class="pill" id="state">読み込み中</span><span id="hint"></span></div>
+  <div class="bar"><button class="btn" id="copy" type="button">答えをコピー</button></div>
+  <textarea id="answer" rows="2" readonly aria-label="答えの一言"></textarea>
+
+  <details class="more">
+  <summary>くわしく（なぜ今聞くか・調べた事実・今と案・このあと）</summary>
+  <p class="lead">担当の未完了 106件（ToDo・ゴール）と、今やるべきToDoの 20行、11/5 以降の活動記録 296件、関わるゴールの本文を読んだ。期限切れは 9件（11/3〜11/15）。うち 3件は本文と記録に終わった証拠があり、2件は終わったかが読み取れず、4件は期限の付け直しが要る。「もうやらない」と読める物は無かった。決めることは 8つ。</p>
+
+  <section>
+    <h2>調べた事実</h2>
+    <p class="sub">出典はゴール本文・AIメモリ・活動記録（Addness）。事実と推測は分けて書いた。</p>
+    <div class="tbl"><table>
+      <tr><th style="width:60px">論点</th><th style="width:260px">対象</th><th>分かったこと</th></tr>
+      <tr><td>Q1</td><td>「ハッピータイム」のChromeを接続し直す（期限 11/6）</td><td>11/8 19:30 に Haruki さんがつなぎ直し（定休日投稿ゴールの本文）。11/14・16・17・18 のストーリーシェアが「Your story is being shared」まで動いている（Instagram予約投稿の本文）。理想の「次の回から動いている」を満たす。</td></tr>
+      <tr><td>Q1</td><td>v7サンプルの微妙な点を全部書き出して伝える（期限 11/3）</td><td>v8〜v21 で指摘を受けて直し、11/12 23:36「いい感じ！これで一旦全体を作ってみてほしい」（AIで編集の本文）。全編 v3 は 11/13 に完成・Mac に置いた。v7 の時点の書き出しは、その後の往復で役目を終えている。</td></tr>
+      <tr><td>Q1</td><td>進め方と見た目を みかみ式に作り直す（上の親）</td><td>理想「冒頭3分のサンプルが本人のOKを得ている」は 11/12 の言葉で満たした。子はこの v7 の1件だけ。編集ルール・検査（check）は autoedit に入っている（AIメモリ 11/12）。</td></tr>
+      <tr><td>Q2</td><td>11/9の体験後に、1時間体験のプランの選ばれ方を確かめて年末の見込みを更新する（期限 11/10）</td><td>11/16 に兄弟タスク「ワンコイン募集を出すか決める」の本文で見込みを更新（「残り3人のうち2人がスタンダードでないと 12月の47回・74万に届かない」「池田さんはゆったりの想定」）。このタスクの本文は空で、「スタンダードを選ぶ割合」の数字は書かれていない。終わったかは本人にしか分からない。</td></tr>
+      <tr><td>Q3</td><td>11/15 YouTube・LINEの数字を答える（期限 11/15）</td><td>11/15 の判断シート「go」で、YouTube 11/2〜11/14＝6,508・LINE 11/2〜11/14＝511 を「引き継ぎ」として入れた。11/15 当日の観測値（登録者数・友だち総数・ブロック数）は、定期タスク「YouTube・LINEの数字を聞く」への返事で入れる決まり。KPI の最終更新は 11/15 12:41（引き継ぎの時刻）なので、観測値はまだ入っていないと読める（推測）。</td></tr>
+      <tr><td>Q4</td><td>撮影済みのYouTube動画をAI編集で仕上げ、11/11に公開する</td><td>IMG_3274 全編 v3（37分35秒）は 11/13 完成。サムネは 11/14 に 27案を提出し、本人の判断待ち（「型 1・7・10 が割といい」まで）。公開はまだ。残りは「サムネを1つ決める → 書き出し → 公開」。</td></tr>
+      <tr><td>Q5</td><td>Instagramの豆投稿6本をOKして、11/10分から予約に入れる（期限 11/9）</td><td>6本は plan.json に pending（OK待ち）のまま。11/3・11/10・11/17 の火曜分は流れた。次の火曜は 11/24。11/8 の記録でも「豆の投稿の OK はまだ無し」。Chrome は復帰しているので、OK が出れば予約できる。</td></tr>
+      <tr><td>Q6</td><td>BASE：カード用クーポンと年末ギフトの登録（期限 11/10）</td><td>10/24 Haruki さん「後回しでOK」。以後の動きなし。年末ギフトを売るなら 12月前半には出す必要がある（推測）。クーポンは「10%引きか〇円引き・1人1回・カード専用コード」が実装できる形（10/24 調べ）。</td></tr>
+      <tr><td>Q7</td><td>2本の曲を決め、素材を用意する（期限 11/8）／親【2026年11月】歌唱発信：長尺2本（期限 11/30）</td><td>本文なし・活動なし。親の 6つの手（曲決め→撮る×2→ミックス×2→聴き比べ）は全部未着手。月末まで 11日。毎朝の段取りも 11/17 から「親の期限を12月に動かすか決める」と出している。</td></tr>
+      <tr><td>Q8</td><td>今やるべきToDo（20行）</td><td>3日続けて同じ顔ぶれ（日誌 11/17〜19）。短く終わる物（数字を答える 2分・LINE公式の開設 5分・豆投稿の OK 一言）が止まっているため、自動化（Instagram 予約）と月末の数字が進まない。「時間の家計簿のリマインド」は 11/19 に完了済み。</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>今と案（今やるべきToDo）</h2>
+    <div class="pair">
+      <figure class="fig"><figcaption><span class="tag now">今</span>20行（期限切れ 8・順番なし）</figcaption><div class="pic">
+        <ul class="tree">
+          <li><span class="done">済</span> 時間の家計簿のリマインドを1日2回に</li>
+          <li><span class="out">v7サンプルの微妙な点を書き出す</span><span class="t">→ Q1 完了</span></li>
+          <li><span class="out">ハッピータイムのChromeを接続し直す</span><span class="t">→ Q1 完了</span></li>
+          <li><span class="out">11/9の体験後に見込みを更新</span><span class="t">→ Q2</span></li>
+          <li>11/15 YouTube・LINEの数字を答える<span class="t">→ Q3</span></li>
+          <li>今日の自分の数値の更新</li>
+          <li>Instagramの豆投稿6本をOK</li>
+          <li>【要Haruki】LINE公式アカウントを開設</li>
+          <li>スキーマ療法のカウンセリングに申し込む</li>
+          <li>2本の曲を決め、素材を用意する</li>
+          <li>会計トレーのカードとギフトPOP</li>
+          <li>行動実験A・B</li>
+          <li><span class="out">【要Haruki】スタンプカードの中身を決める</span><span class="t">外す</span></li>
+          <li><span class="out">ネット上の店舗情報の統一</span><span class="t">外す</span></li>
+          <li><span class="out">歌唱発信の現状を棚卸しする</span><span class="t">外す</span></li>
+          <li><span class="out">発信の形と交差のタイミングを決める</span><span class="t">外す</span></li>
+          <li><span class="out">ルール外の日の振る舞いを伝える</span><span class="t">外す</span></li>
+          <li><span class="out">服5点のゴールを分解する</span><span class="t">外す</span></li>
+          <li><span class="out">ETCカードを申し込む</span><span class="t">外す</span></li>
+          <li><span class="out">実感ログ（ワーク⑤）</span><span class="t">外す（続ける物。一覧には置かない）</span></li>
+        </ul>
+      </div></figure>
+      <figure class="fig"><figcaption><span class="tag rec">推奨</span>9行（短い物から。上から順にやる）</figcaption><div class="pic">
+        <ul class="tree">
+          <li><span class="n">1</span>今日の自分の数値の更新<span class="t">AIに「やって」。残り3本</span></li>
+          <li><span class="n">2</span>11/15 YouTube・LINEの数字を答える<span class="t">2分</span></li>
+          <li><span class="n">3</span>Instagramの豆投稿6本をOK<span class="t">一言。11/24分の予約へ</span></li>
+          <li><span class="n">4</span>【要Haruki】LINE公式アカウントを開設<span class="t">5分</span></li>
+          <li><span class="n">5</span>サムネを1つ決める<span class="t">新しく入れる。27案から一言</span></li>
+          <li><span class="n">6</span>スキーマ療法のカウンセリングに申し込む<span class="t">11月中に受けるなら今週</span></li>
+          <li><span class="n">7</span>2本の曲を決め、録音日を2回分カレンダーに</li>
+          <li><span class="n">8</span>会計トレーのカード：口コミ面を1案に絞る<span class="t">→ 印刷データ</span></li>
+          <li><span class="n">9</span>行動実験B（家でご飯の日に）<span class="t">夜</span></li>
+        </ul>
+      </div></figure>
+    </div>
+    <p class="sub">外す 8行はゴールとして残る（消さない）。片づけた数の見込み：完了 3〜5・期限の付け直し 4〜5・残す 96。</p>
+  </section>
+
+  <section>
+    <h2>このあと（推奨のまま進めた場合）</h2>
+    <ul>
+      <li>AI：Q1〜Q7 を Addness に反映する（完了・期限・題の変更）。変えたことは、それぞれの親ゴールの本文に日付つきで1行書く。</li>
+      <li>AI：今やるべきToDoを 9行にする（サムネを足し、8行を外す。外した物のゴールは残す）。</li>
+      <li>AI：Q2・Q3 の答えが「完了」なら完了にし、「まだ」なら期限を付け直す。</li>
+      <li>本人：9行を上から順にやる。1 と 5 は AI に一言で頼める。</li>
+      <li>AI：日誌 days/2026-11-19.md に記録し、push する。</li>
+    </ul>
+  </section>
+  </details>
+</div>
+<script>
+(function(){
+  var KEY = "decisions/task-cleaning-20261119";
+  var QUESTIONS = [
+    { id:"q1", t:"終わった証拠がある3件（Chromeの接続・v7の書き出し・みかみ式に作り直す）を完了にする", why:"Chrome は 11/8 復帰し 11/14〜18 のシェアが動いている。v7 は v21 まで直して 11/12 に「いい感じ」で全編へ進んだ。",
+      opts:[ {v:"a", l:"A: 3件とも完了にする", s:"今やるべきToDoからも消える。完了の取り消しはできる", rec:true},
+             {v:"b", l:"B: 完了にしない", s:"3件とも今の場所に残る"} ] },
+    { id:"q2", t:"「11/9の体験後に年末の見込みを更新する」は終わったか", why:"11/16 に別のタスクの本文で見込み（12月47回・74万に届かない見込み）を更新済み。割合の数字はどこにも無い。",
+      opts:[ {v:"a", l:"A: 終わった → 完了にする", s:"11/16 の見込み更新を証拠として本文に1行書く", rec:true},
+             {v:"b", l:"B: まだ → 期限を 11/30 に付け直す", s:"残り3人の体験が終わった後に割合を出す"} ] },
+    { id:"q3", t:"「11/15 YouTube・LINEの数字を答える」はもう答えたか", why:"11/15 の KPI には引き継ぎの値だけが入り、当日の観測値はまだ入っていないと読める。",
+      opts:[ {v:"a", l:"A: まだ → 期限を今日にして、今日の2番目にやる", s:"YouTube Studio の登録者数と LINE の友だち総数・ブロック数を答える（2分）", rec:true},
+             {v:"b", l:"B: もう答えた → 完了にする", s:"今やるべきToDoから消える"} ] },
+    { id:"q4", t:"「YouTube動画を 11/11 に公開する」の期限を付け直す", why:"動画は完成、残りはサムネを決めて公開するだけ。11月のボイトレの節目（11/30）に収める。",
+      opts:[ {v:"a", l:"A: 期限 11/30・題を「11月中に公開する」に", s:"題は「撮影済みのYouTube動画をAI編集で仕上げ、11月中に公開する」。本文に 11/11→11/30 の理由を書く", rec:true},
+             {v:"b", l:"B: 期限 12/15 に", s:"12月の座組みの方に置き直す"} ] },
+    { id:"q5", t:"「Instagramの豆投稿6本をOKして 11/10分から予約」の期限を付け直す", why:"11/3・11/10・11/17 分は流れた。次の火曜 11/24 に乗せるには、前日までの OK が要る。",
+      opts:[ {v:"a", l:"A: 期限 11/23・題を「11/24分から」に", s:"今日 OK が出れば 11/24 分をすぐ予約できる。流れた3本は 12月以降の火曜に回す", rec:true},
+             {v:"b", l:"B: 豆の投稿はやめる（タスクを消す）", s:"11月の紙の施策③が無くなる。30日以内なら戻せる"} ] },
+    { id:"q6", t:"「BASE：カード用クーポンと年末ギフトの登録」の期限を付け直す", why:"10/24 に Haruki さんが「後回しでOK」。年末ギフトを売るなら 12月前半には出す。",
+      opts:[ {v:"a", l:"A: 期限 12/5 に", s:"口コミカードの印刷が決まった後にクーポンコードを作る流れに合う", rec:true},
+             {v:"b", l:"B: やらない（タスクを消す）", s:"カードの表の「初回クーポン」の欄は空のまま。30日以内なら戻せる"} ] },
+    { id:"q7", t:"「2本の曲を決める」（11/8 期限）と、親【2026年11月】長尺2本（11/30）の期限", why:"6つの手が全部未着手で、残り 11日。撮影2本＋ミックス2本は厳しいと見た。曲決めは今週中にできる大きさ。",
+      opts:[ {v:"a", l:"A: 曲決めは 11/23、親は 12/31 に動かす", s:"親の題を【2026年11〜12月】に。12月の「出せる1本を公開」は年明けにずれる可能性を本文に書く", rec:true},
+             {v:"b", l:"B: 曲決めは 11/23、親は 11/30 のまま", s:"今週末までに2本撮る前提。月末に届かなければ、その時に動かす"} ] },
+    { id:"q8", t:"今日やる順は、右の案（9行）でよいか", why:"短く終わる物を先に。止まっている自動化と月末の数字が先に動く。外す 8行はゴールとして残す。",
+      opts:[ {v:"a", l:"A: この順でよい", s:"サムネを1行足し、8行を今やるべきToDoから外す", rec:true},
+             {v:"b", l:"B: 上から5つまでに減らす", s:"6〜9 も一覧から外す（ゴールは残る）"} ] },
+  ];
+
+  var state={}; QUESTIONS.forEach(function(q){ var r=q.opts.filter(function(o){return o.rec;})[0]; state[q.id]=(r||q.opts[0]).v; });
+  var OTHER={v:"other", l:"その他", s:"選択肢に無い答えを、下の欄に一言で"};
+  var db=null, saving=false, dirty=false;
+  var $=function(id){return document.getElementById(id);};
+  function answerText(){
+    var a=QUESTIONS.map(function(q){ var n=(state[q.id+"_note"]||"").trim(), v=state[q.id]==="other"?"その他":state[q.id].toUpperCase(); return q.id.toUpperCase()+" "+v+(n?"（"+n+"）":""); }).join(" / ");
+    var x=(state.extra||"").trim(); return a+(x?" / 追加の指示："+x:"");
+  }
+  function render(){
+    var root=$("qs"); root.innerHTML="";
+    QUESTIONS.forEach(function(q){
+      var box=document.createElement("div"); box.className="q";
+      var left=document.createElement("div");
+      left.innerHTML='<div class="qt"><span class="id">'+q.id.toUpperCase()+'</span>'+q.t+'</div><div class="why">'+q.why+'</div>';
+      var opts=document.createElement("div"); opts.className="opts"; opts.setAttribute("role","radiogroup"); opts.setAttribute("aria-label",q.t);
+      q.opts.concat([OTHER]).forEach(function(o){
+        var b=document.createElement("button"); b.type="button"; b.className="opt"; b.id=q.id+"-"+o.v;
+        b.setAttribute("role","radio"); b.setAttribute("aria-checked",String(state[q.id]===o.v));
+        b.innerHTML='<span class="dot"></span><span><span class="l">'+o.l+'</span>'+(o.rec?'<span class="rec">推奨</span>':'')+(o.s?'<span class="s">'+o.s+'</span>':'')+'</span>';
+        b.addEventListener("click",function(){
+          if(state[q.id]!==o.v){ state[q.id]=o.v; render(); persist(); }
+          if(o.v==="other"){ var t=$(q.id+"-note"); if(t) t.focus(); }
+        });
+        opts.appendChild(b);
+      });
+      var note=document.createElement("div"); note.className="note";
+      var ta=document.createElement("textarea"); ta.id=q.id+"-note"; ta.placeholder=state[q.id]==="other"?"「その他」の答えを一言で":"聞きたいこと・補足があれば一言（任意）"; ta.value=state[q.id+"_note"]||"";
+      var timer; ta.addEventListener("input",function(){ state[q.id+"_note"]=ta.value; $("answer").value=answerText(); clearTimeout(timer); timer=setTimeout(persist,600); });
+      note.appendChild(ta); box.appendChild(left); box.appendChild(opts); box.appendChild(note); root.appendChild(box);
+    });
+    $("answer").value=answerText();
+  }
+  function status(kind,text,hint){ $("state").className="pill"+(kind?" "+kind:""); $("state").textContent=text; $("hint").textContent=hint||""; }
+  function saveLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(_){} }
+  async function persist(){
+    saveLocal();
+    if(!db){ status("warn","この画面だけ","保存先がありません。下の「答えをコピー」で一言を返してください。"); return; }
+    if(saving){ dirty=true; return; } saving=true; status("","保存中");
+    try{ await db.doc(KEY).set(Object.assign({},state,{version:1,updatedAt:new Date().toISOString()})); status("ok","保存しました","最終保存 "+new Date().toLocaleString("ja-JP")); }
+    catch(e){ status("warn","保存できませんでした","「答えをコピー」で一言を返してください。"); }
+    finally{ saving=false; if(dirty){ dirty=false; persist(); } }
+  }
+  $("copy").addEventListener("click",function(){
+    var t=answerText(), box=$("answer"); box.value=t;
+    try{ navigator.clipboard.writeText(t).then(function(){ status("ok","コピーしました","会話に貼ってください。"); },function(){ box.select(); }); }catch(_){ box.select(); }
+  });
+  try{ var saved=JSON.parse(localStorage.getItem(KEY)||"null"); if(saved) Object.assign(state,saved); }catch(_){}
+  var ex=$("extra"), exTimer; ex.value=state.extra||"";
+  ex.addEventListener("input",function(){ state.extra=ex.value; $("answer").value=answerText(); clearTimeout(exTimer); exTimer=setTimeout(persist,600); });
+  render(); status("","未保存（推奨のまま）","");
+  (async function(){
+    try{ db = window.claude && window.claude.use ? await window.claude.use("db") : null; }catch(_){ db=null; }
+    if(!db) return;
+    db.doc(KEY).onSnapshot(function(snap){
+      var d = snap && snap.exists ? (typeof snap.data==="function" ? snap.data() : snap.data) : null;
+      if(d && d.version===1){
+        var ae=document.activeElement, typing=!!(ae && ae.tagName==="TEXTAREA" && !ae.readOnly);
+        QUESTIONS.forEach(function(q){ if(d[q.id]) state[q.id]=d[q.id]; if(typeof d[q.id+"_note"]==="string" && !(typing && ae.id===q.id+"-note")) state[q.id+"_note"]=d[q.id+"_note"]; });
+        if(typeof d.extra==="string" && !(typing && ae.id==="extra")){ state.extra=d.extra; ex.value=d.extra; }
+        if(typing) $("answer").value=answerText(); else render();
+        status("ok","保存済み","この画面の選択は、聞いた AI が読みます。");
+      }
+    }, function(){});
+  })();
+})();
+</script>
